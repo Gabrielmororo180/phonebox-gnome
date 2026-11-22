@@ -17,8 +17,8 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 
 const AGENT = 'http://127.0.0.1:8765';
-const WIDGET_BUS_NAME = 'net.oxog.phonebox.Widget';
-const WIDGET_OBJECT_PATH = '/net/oxog/phonebox/Widget';
+const WIDGET_BUS_NAME = 'io.github.gabrielmororo180.PhoneBoxGnome';
+const WIDGET_OBJECT_PATH = '/io/github/gabrielmororo180/PhoneBoxGnome';
 const WIDGET_WM_CLASS = 'phonebox-widget';
 const STATE_SECONDS = 2;
 const QUOTA_SECONDS = 30;

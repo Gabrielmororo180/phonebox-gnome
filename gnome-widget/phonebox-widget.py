@@ -32,7 +32,7 @@ gi.require_version("Gdk", "3.0")
 gi.require_version("WebKit2", "4.1")
 from gi.repository import Gdk, Gio, GLib, Gtk, WebKit2  # noqa: E402
 
-APP_ID = "net.oxog.phonebox.Widget"
+APP_ID = "io.github.gabrielmororo180.PhoneBoxGnome"
 CONFIG_DIR = os.path.join(os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config"), "phonebox-widget")
 STATE_FILE = os.path.join(CONFIG_DIR, "state.json")
 RETRY_SECONDS = 5

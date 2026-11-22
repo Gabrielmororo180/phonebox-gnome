@@ -4,7 +4,7 @@
 #   ./install.sh --uninstall  remove the extension (the widget stays; remove it with ../gnome-widget/install.sh --uninstall)
 set -euo pipefail
 
-UUID="phonebox@oxog.net"
+UUID="phonebox-gnome@gabrielmororo180.github.io"
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEST="${XDG_DATA_HOME:-$HOME/.local/share}/gnome-shell/extensions/$UUID"
 AUTOSTART="${XDG_CONFIG_HOME:-$HOME/.config}/autostart/phonebox-widget.desktop"
