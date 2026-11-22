@@ -18,6 +18,7 @@ Keys: F5 reload, Ctrl+Q quit, Esc hides the dropdown.
 import argparse
 import json
 import os
+import re
 import signal
 import sys
 
@@ -37,6 +38,35 @@ CONFIG_DIR = os.path.join(os.environ.get("XDG_CONFIG_HOME") or os.path.expanduse
 STATE_FILE = os.path.join(CONFIG_DIR, "state.json")
 RETRY_SECONDS = 5
 TABS_POLL_MS = 700
+# Only GitHub pull request pages are opened from the panel: the page asks, the widget checks.
+PR_URL = re.compile(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/pull/[0-9]+")
+
+# The panel's GitHub widget draws its pull requests as plain rows. This makes them open in the browser: a click
+# finds the row's pull request in the panel's own data (main.js's D.work.github), whose rows only show the repo's
+# short name, and asks the widget to open it.
+JS_PR_LINKS = """(() => {
+  // one listener per document, however often the script is injected
+  if (!location.pathname.startsWith('/panel') || window.__pbPrLinks) return;
+  window.__pbPrLinks = true;
+  let last = 0;
+  const style = document.createElement('style');
+  style.textContent = '.gh-pr { cursor: pointer; } .gh-pr:hover .tt { text-decoration: underline; }';
+  document.head.append(style);
+  document.addEventListener('click', async (e) => {
+    const row = e.target.closest && e.target.closest('.gh-pr');
+    const m = row && /^(.+)#(\\d+)$/.exec(row.querySelector('.rp')?.textContent || '');
+    if (!m || Date.now() - last < 600) return;   // one click can arrive twice (seen with element.click())
+    last = Date.now();
+    // absolute: an injected script has no base URL of its own for a relative import
+    const { D } = await import(new URL('main.js', location.href).href);
+    const g = D.work && D.work.github;
+    const prs = [...(g?.myPrs || []), ...(g?.reviewRequests || [])]
+      .filter((p) => String(p.number) === m[2] && p.repo.split('/')[1] === m[1]);
+    const title = row.querySelector('.tt')?.textContent;
+    const pr = prs.find((p) => p.title === title) || prs[0];
+    if (pr) window.webkit.messageHandlers.pbOpen.postMessage(`https://github.com/${pr.repo}/pull/${pr.number}`);
+  }, true);
+})();"""
 
 # The panel is an ES module; importing main.js again returns the same live instance, so its pages, current page and
 # goPage() can be used from here without changing the panel.
@@ -114,7 +144,13 @@ class Widget(Gtk.ApplicationWindow):
         self.below = args.below
         above = True if args.above or self.dropdown else False if args.below else self.state.get("above", True)
 
-        self.web = WebKit2.WebView()
+        content = WebKit2.UserContentManager()
+        content.register_script_message_handler("pbOpen")
+        content.connect("script-message-received::pbOpen", self.on_open_request)
+        content.add_script(WebKit2.UserScript.new(
+            JS_PR_LINKS, WebKit2.UserContentInjectedFrames.TOP_FRAME,
+            WebKit2.UserScriptInjectionTime.END, None, None))
+        self.web = WebKit2.WebView.new_with_user_content_manager(content)
         settings = self.web.get_settings()
         settings.set_enable_developer_extras(args.debug)
         settings.set_media_playback_requires_user_gesture(False)
@@ -146,6 +182,19 @@ class Widget(Gtk.ApplicationWindow):
         self.web.load_uri(args.url)
         if not args.no_tabs:
             GLib.timeout_add(TABS_POLL_MS, self.poll_tabs)
+
+    def on_open_request(self, _content, result):
+        url = result.get_js_value().to_string()
+        if not PR_URL.fullmatch(url):
+            print(f"phonebox-widget: not opening {url!r}", file=sys.stderr)
+            return
+        try:
+            Gio.AppInfo.launch_default_for_uri(url, None)
+        except GLib.Error as e:
+            print(f"phonebox-widget: could not open {url}: {e.message}", file=sys.stderr)
+            return
+        if self.dropdown:
+            self.hide()
 
     # ---------------------------------------------------------------- page tabs
     def build_tabs(self):

@@ -21,6 +21,7 @@ phonebox-widget &
 
 ## Use
 
+- **GitHub:** click a pull request in the GitHub widget to open it in your browser (the dropdown hides itself).
 - **Pages:** click a tab under the handle to switch pages (the mouse wheel scrolls the tabs). The active tab
   follows the panel when it changes page by itself.
 - **Move:** drag the handle on top. **Resize:** drag the bottom-right corner.
