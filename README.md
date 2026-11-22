@@ -3,7 +3,7 @@
 [PhoneBox](https://github.com/ersinkoc/phonebox) on the Linux desktop: CPU and the Claude session quota in the
 GNOME top bar, and the full PhoneBox panel, page tabs included, one click away.
 
-<img src="https://github.com/Gabrielmororo180/phonebox/blob/assets/gnome-top-bar.png?raw=true" width="420" alt="The indicator reads CPU 22% · Claude 14% in the GNOME top bar, and the PhoneBox panel with its page tabs is open below it">
+<img src="docs/gnome-top-bar.png" width="420" alt="The indicator reads CPU 22% · Claude 14% in the GNOME top bar, and the PhoneBox panel with its page tabs is open below it">
 
 A community add-on, not part of PhoneBox itself. It only talks to the PhoneBox agent on `127.0.0.1`; nothing
 leaves the computer.
