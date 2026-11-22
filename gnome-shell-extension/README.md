@@ -14,7 +14,10 @@ full panel, page tabs included, one click away.
 - **Left click** shows the panel under the indicator; clicking again, pressing **Esc** or clicking anywhere else
   hides it.
 - **Right click** opens the settings page (<http://127.0.0.1:8765>).
-- The text is dimmed and reads "PhoneBox" while the agent is not running.
+- The text is dimmed and reads "PhoneBox" while the agent is not running. The Claude part is the 5-hour session
+  limit, and is left out when the agent reports none.
+- **Agent port:** 8765 by default. If the agent runs with `--port`, set the same port in the extension's
+  preferences (`gnome-extensions prefs phonebox-gnome@gabrielmororo180.github.io`, or the Extensions app).
 
 The panel is the [desktop widget](../gnome-widget) in its `--dropdown` mode. The extension starts it hidden at
 login, so the first click opens a panel that has already loaded, and shows and hides it over D-Bus (the
@@ -22,7 +25,7 @@ login, so the first click opens a panel that has already loaded, and shows and h
 
 ## Install
 
-Needs GNOME Shell 45–48, a running PhoneBox agent, and GTK 3 with WebKitGTK 4.1 for Python
+Needs GNOME Shell 45 or later (developed and used on 46; 47–51 are declared but not tried yet), a running PhoneBox agent, and GTK 3 with WebKitGTK 4.1 for Python
 (`sudo apt install python3-gi gir1.2-webkit2-4.1` on Debian/Ubuntu).
 
 ```sh

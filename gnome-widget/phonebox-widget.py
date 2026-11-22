@@ -11,7 +11,7 @@ GNOME on Wayland lets no app place itself or stay below other windows, so the wi
 
 With --dropdown it is the panel of the PhoneBox GNOME Shell extension (gnome-shell-extension/ in this repository): it starts
 hidden, has no handle, and the extension shows it under its top bar indicator (actions "show(x, y)" and "hide" on
-D-Bus, which every Gtk.Application exports).
+D-Bus, which every Gtk.Application exports; "navigate(url)" starts it hidden and points it at the agent).
 
 Keys: F5 reload, Ctrl+Q quit, Esc hides the dropdown.
 """
@@ -332,6 +332,12 @@ class Widget(Gtk.ApplicationWindow):
         GLib.timeout_add(1000, self.start_tracking)
         return False
 
+    def navigate(self, url):
+        if url and url != self.args.url:
+            self.args.url = url
+            self.tab_pages = None
+            self.web.load_uri(url)
+
     def show_at(self, x, y):
         self.move(x, y)
         self.show_all()
@@ -387,9 +393,10 @@ class App(Gtk.Application):
         show.connect("activate", lambda _a, xy: self.ensure_window().show_at(*xy.unpack()))
         hide = Gio.SimpleAction.new("hide", None)
         hide.connect("activate", lambda *_: self.win and self.win.hide())
-        preload = Gio.SimpleAction.new("preload", None)
-        preload.connect("activate", lambda *_: self.ensure_window())
-        for action in (show, hide, preload):
+        # starts the panel hidden if needed, and points it at the agent the extension uses (its port is a setting)
+        navigate = Gio.SimpleAction.new("navigate", GLib.VariantType.new("s"))
+        navigate.connect("activate", lambda _a, url: self.ensure_window().navigate(url.get_string()))
+        for action in (show, hide, navigate):
             self.add_action(action)
 
     def close_window(self):

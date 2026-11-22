@@ -17,7 +17,7 @@ leaves the computer.
 
 ## Install
 
-Needs a running [PhoneBox agent](https://github.com/ersinkoc/phonebox#quick-start), GNOME Shell 45 or later,
+Needs a running [PhoneBox agent](https://github.com/ersinkoc/phonebox#quick-start), GNOME Shell 45 or later (used on 46; 47–51 not tried yet),
 and GTK 3 with WebKitGTK 4.1 for Python:
 
 ```sh
